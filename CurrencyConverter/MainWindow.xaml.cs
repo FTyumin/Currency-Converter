@@ -25,6 +25,10 @@ namespace CurrencyConverter
         public MainWindow()
         {
             InitializeComponent();
+
+            ClearControls();
+
+            BindCurrency();
         }
 
         private void BindCurrency()
@@ -63,6 +67,7 @@ namespace CurrencyConverter
             cmbToCurrency.SelectedValuePath = "Value";
             cmbToCurrency.SelectedIndex = 0;
         }
+         
 
         private void ClearControls()
         {
@@ -78,8 +83,8 @@ namespace CurrencyConverter
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             //Regular Expression to add regex add library using System.Text.RegularExpressions;
-            Regex regex = new Regex("^[0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
+            Regex regex = new Regex("^[0-9]*([.,][0-9]+)?$");
+            e.Handled = !regex.IsMatch(e.Text);
         }
 
         private void Convert_Click(object sender, RoutedEventArgs e)
