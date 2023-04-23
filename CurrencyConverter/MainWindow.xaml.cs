@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Data.SqlClient;
+using System.Configuration;
 
 namespace CurrencyConverter
 {
@@ -22,6 +13,13 @@ namespace CurrencyConverter
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        SqlConnection con = new SqlConnection();
+
+        SqlCommand cmd = new SqlCommand();
+
+        SqlDataAdapter adapter = new SqlDataAdapter();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -148,7 +146,12 @@ namespace CurrencyConverter
             ClearControls();
         }
 
-        
+        public void mycon()
+        {
+            String Conn = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+            con = new SqlConnection(Conn);
+            con.Open();
+        }
 
         
     }
