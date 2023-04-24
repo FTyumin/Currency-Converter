@@ -31,51 +31,62 @@ namespace CurrencyConverter
 
         private void BindCurrency()
         {
-            DataTable dtCurrency = new DataTable();
-            //Add display column in DataTable
-            dtCurrency.Columns.Add("Text");
 
-            //Add value column in DataTable
-            dtCurrency.Columns.Add("Value");
 
-            //Add rows in Datatable with text and value
-            dtCurrency.Rows.Add("--SELECT--", 0);
-            dtCurrency.Rows.Add("INR", 1);
-            dtCurrency.Rows.Add("USD", 75);
-            dtCurrency.Rows.Add("EUR", 85);
-            dtCurrency.Rows.Add("SAR", 20);
-            dtCurrency.Rows.Add("POUND", 5);
-            dtCurrency.Rows.Add("DEM", 43);
+            mycon();
 
-            //The data to currency Combobox is assigned from datatable
-            cmbFromCurrency.ItemsSource = dtCurrency.DefaultView;
+            //Create an object for DataTable
+            DataTable dt = new DataTable();
+            //Write query for get data from Currency_Master table
+            cmd = new SqlCommand("select Id, CurrencyName from Currency_Master", con);
+            //CommandType define which type of command we use for write a query
+            cmd.CommandType = CommandType.Text;
+            //It accepts a parameter that contains the command text of the object's selectCommand property.
+            da = new SqlDataAdapter(cmd);
 
-            //DisplayMemberPath Property is used to display data in Combobox
-            cmbFromCurrency.DisplayMemberPath = "Text";
+            da.Fill(dt);
 
-            //SelectedValuePath property is used to set the value in Combobox
-            cmbFromCurrency.SelectedValuePath = "Value";
+            //Create an object for DataRow
+            DataRow newRow = dt.NewRow();
 
-            //SelectedIndex property is used to bind hint in the Combobox. The default value is Select.
-            cmbFromCurrency.SelectedIndex = 0;
+            //Assign a value to Id column
+            newRow["Id"] = 0;
 
-            //All properties are set for 'To Currency' Combobox as 'From Currency' Combobox
-            cmbToCurrency.ItemsSource = dtCurrency.DefaultView;
-            cmbToCurrency.DisplayMemberPath = "Text";
-            cmbToCurrency.SelectedValuePath = "Value";
-            cmbToCurrency.SelectedIndex = 0;
+            //Assign value to CurrencyName column
+            newRow["CurrencyName"] = "--SELECT--";
+
+            //Insert a new row in dt with the data at a 0 position
+            dt.Rows.InsertAt(newRow, 0);
+
+            //The dt is not null and rows count greater than 0
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                //Assign the datatable data to from currency combobox using ItemSource property.
+                cmbFromCurrency.ItemsSource = dt.DefaultView;
+
+                //Assign the datatable data to to currency combobox using ItemSource property.
+                cmbToCurrency.ItemsSource = dt.DefaultView;
+            }
+            con.Close();
+
+            //To display the underlying datasource for cmbFromCurrency
+            cmbFromCurrency.DisplayMemberPath = "CurrencyName";
+
+            //To use as the actual value for the items
+            cmbFromCurrency.SelectedValuePath = "Id";
+
+            //Show default item in combobox
+            cmbFromCurrency.SelectedValue = 0;
+
+            cmbToCurrency.DisplayMemberPath = "CurrencyName";
+            cmbToCurrency.SelectedValuePath = "Id";
+            cmbToCurrency.SelectedValue = 0;
         }
          
 
         private void ClearControls()
         {
-            txtCurrency.Text = string.Empty;
-            if (cmbFromCurrency.Items.Count > 0)
-                cmbFromCurrency.SelectedIndex = 0;
-            if (cmbToCurrency.Items.Count > 0)
-                cmbToCurrency.SelectedIndex = 0;
-            lblCurrency.Content = "";
-            txtCurrency.Focus();
+            
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
