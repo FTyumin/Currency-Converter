@@ -15,6 +15,8 @@ namespace CurrencyConverter
     public partial class MainWindow : Window
     {
 
+        Root val = new Root();
+
         public class Root
         {
             public Rate rates { get; set; }
@@ -34,6 +36,8 @@ namespace CurrencyConverter
             public double PHP { get; set; }
             public double DKK { get; set; }
             public double CZK { get; set; }
+            public double GBP { get; set; }
+            public double RUB { get; set; }
         }
 
         public MainWindow()
@@ -43,8 +47,13 @@ namespace CurrencyConverter
 
             //ClearControls method is used to clear all control values
             ClearControls();
+            GetValue();
 
-            //BindCurrency is used to bind currency name with the value in the Combobox
+        }
+
+        private async void GetValue()
+        {
+            val = await GetData<Root>("https://openexchangerates.org/api/latest.json?app_id=e0b4098cb8864b6d8c167114bdd89e79");
             BindCurrency();
         }
 
@@ -62,8 +71,8 @@ namespace CurrencyConverter
                         var ResponseString = await response.Content.ReadAsStringAsync();
                         var ResponseObject = JsonConvert.DeserializeObject<Root>(ResponseString);
 
-                        MessageBox.Show("Timestamp: " + ResponseObject.timestamp, "Information", MessageBoxButton.OK,
-                            MessageBoxImage);
+                        //MessageBox.Show("Timestamp: " + ResponseObject.timestamp, "Information", MessageBoxButton.OK,
+                        //    MessageBoxImage.Information);
 
                         return ResponseObject;
                     }
@@ -91,12 +100,12 @@ namespace CurrencyConverter
 
             //Add rows in the Datatable with text and value
             dtCurrency.Rows.Add("--SELECT--", 0);
-            dtCurrency.Rows.Add("INR", 1);
-            dtCurrency.Rows.Add("USD", 75);
-            dtCurrency.Rows.Add("EUR", 85);
-            dtCurrency.Rows.Add("SAR", 20);
-            dtCurrency.Rows.Add("POUND", 5);
-            dtCurrency.Rows.Add("DEM", 43);
+            dtCurrency.Rows.Add("INR", val.rates.INR);
+            dtCurrency.Rows.Add("USD", val.rates.USD);
+            dtCurrency.Rows.Add("EUR", val.rates.EUR);
+            dtCurrency.Rows.Add("RUB", val.rates.RUB);
+            dtCurrency.Rows.Add("POUND", val.rates.GBP);
+            
 
             //Datatable data assigned from the currency combobox
             cmbFromCurrency.ItemsSource = dtCurrency.DefaultView;
@@ -171,7 +180,8 @@ namespace CurrencyConverter
             {
                 //Calculation for currency converter is From Currency value multiply(*) 
                 //With the amount textbox value and then that total divided(/) with To Currency value
-                ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+                ConvertedValue = (double.Parse(cmbToCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text))
+                    / double.Parse(cmbFromCurrency.SelectedValue.ToString());
 
                 //Show the label converted currency and converted currency name.
                 lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");
